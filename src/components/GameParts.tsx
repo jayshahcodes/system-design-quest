@@ -1,4 +1,4 @@
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent, DragEvent, FormEvent } from 'react'
 import type { ComponentType, Connection, GameComponent, TaskDefinition, TaskRule, ValidationResult } from '../types'
 import { componentTypes } from '../types'
 import {
@@ -9,6 +9,10 @@ import { Badge } from './shared/Badge'
 import { Button } from './shared/Button'
 import { InputField, SelectField } from './shared/Fields'
 import { ComponentOptions, ComponentTypeOptions } from './shared/Options'
+import { getPosition, getSettings } from '../lib/architecture'
+import { getTechnologies, getTechnology } from '../data/technologies'
+import type { Technology } from '../data/technologies'
+import { dragFormats, isDatabase, playgroundCopy, taskDifficultyLabel, toolDetails } from '../gameConstants'
 
 function renderRule(rule: TaskRule) {
   return <li key={rule.label}>{rule.label}</li>
@@ -18,7 +22,7 @@ export function TaskBrief({ task }: { task: TaskDefinition }) {
   return (
     <section className="task-brief panel">
       <div>
-        <Badge>{gameCopy.easy}</Badge>
+        <Badge>{taskDifficultyLabel(task.difficulty)}</Badge>
         <h2>{task.title}</h2>
         <p>{task.description}</p>
         <details>
@@ -44,8 +48,13 @@ function LibraryButton({ type, onAdd }: LibraryButtonProps) {
     onAdd(type)
   }
 
+  function startDrag(event: DragEvent<HTMLButtonElement>) {
+    event.dataTransfer.setData(dragFormats.library, type)
+    event.dataTransfer.effectAllowed = 'copy'
+  }
+
   return (
-    <Button className="library-button" onClick={add} aria-label={addComponentLabel(type)}>
+    <Button className="library-button" draggable onDragStart={startDrag} onClick={add} aria-label={addComponentLabel(type)}>
       <span>{componentIcons[type]}</span>
       {type}
       <span className="ml-auto">{symbols.plus}</span>
@@ -61,7 +70,7 @@ export function ComponentLibrary({ onAdd }: { onAdd: (type: ComponentType) => vo
   return (
     <aside className="panel library">
       <h2>{gameCopy.library}</h2>
-      <p className="muted small">{gameCopy.addHelp}</p>
+      <p className="muted small">{playgroundCopy.libraryHelp}</p>
       {componentTypes.map(renderType)}
       <p className="muted small">{gameCopy.replicasHelp}</p>
     </aside>
@@ -85,9 +94,9 @@ export function ComponentCard({ component, onEdit, onRemove }: ComponentCardProp
 
   return (
     <article className="component-card">
-      <span className="component-symbol">{componentIcons[component.type]}</span>
       <h3>{component.name}</h3>
       <p>{componentDetails(component.type, component.replicas)}</p>
+      <p>{toolDetails(getTechnology(component).name)}</p>
       <div>
         <Button variant="text" aria-label={editComponentLabel(component.name)} onClick={edit}>
           {gameCopy.edit}
@@ -108,17 +117,49 @@ interface ComponentEditorProps {
 }
 
 export function ComponentEditor({ component, onChange, onSave, onCancel }: ComponentEditorProps) {
+  const settings = getSettings(component)
+  const position = getPosition(component, 0)
+
   function changeName(event: ChangeEvent<HTMLInputElement>) {
     onChange({ ...component, name: event.target.value })
   }
 
   function changeType(event: ChangeEvent<HTMLSelectElement>) {
-    onChange({ ...component, type: event.target.value as ComponentType })
+    onChange({ ...component, type: event.target.value as ComponentType, settings: {} })
   }
 
   function changeReplicas(event: ChangeEvent<HTMLInputElement>) {
     onChange({ ...component, replicas: event.target.valueAsNumber })
   }
+
+  function changeTechnology(event: ChangeEvent<HTMLSelectElement>) {
+    onChange({ ...component, settings: { ...component.settings, technology: event.target.value } })
+  }
+  function changeCapacity(event: ChangeEvent<HTMLInputElement>) {
+    onChange({ ...component, settings: { ...component.settings, capacity: event.target.valueAsNumber } })
+  }
+  function changeShards(event: ChangeEvent<HTMLInputElement>) {
+    onChange({ ...component, settings: { ...component.settings, shards: event.target.valueAsNumber } })
+  }
+  function changeTtl(event: ChangeEvent<HTMLInputElement>) {
+    onChange({ ...component, settings: { ...component.settings, ttlSeconds: event.target.valueAsNumber } })
+  }
+  function changePolicy(event: ChangeEvent<HTMLSelectElement>) {
+    onChange({ ...component, settings: { ...component.settings, cachePolicy: event.target.value as 'cache-aside' | 'write-through' } })
+  }
+  function changeStateless(event: ChangeEvent<HTMLSelectElement>) {
+    onChange({ ...component, settings: { ...component.settings, stateless: event.target.value === 'true' } })
+  }
+  function changeX(event: ChangeEvent<HTMLInputElement>) {
+    onChange({ ...component, position: { ...position, x: event.target.valueAsNumber } })
+  }
+  function changeY(event: ChangeEvent<HTMLInputElement>) {
+    onChange({ ...component, position: { ...position, y: event.target.valueAsNumber } })
+  }
+  function renderTechnology(technology: Technology) {
+    return <option key={technology.id} value={technology.id}>{technology.name}</option>
+  }
+  function numericValue(value: number) { return Number.isNaN(value) ? '' : value }
 
   return (
     <form className="edit-form" onSubmit={onSave}>
@@ -145,6 +186,36 @@ export function ComponentEditor({ component, onChange, onSave, onCancel }: Compo
         value={Number.isNaN(component.replicas) ? '' : component.replicas}
         onChange={changeReplicas}
       />
+      <SelectField id="component-technology" label={playgroundCopy.tool} value={settings.technology} onChange={changeTechnology}>
+        {getTechnologies(component.type).map(renderTechnology)}
+      </SelectField>
+      <p className="muted small">{getTechnology(component).description}</p>
+      <p className="muted small">{playgroundCopy.toolsHelp}</p>
+      <InputField id="component-capacity" label={playgroundCopy.capacity} type="number" min={1} max={100000} step={1}
+        required value={numericValue(settings.capacity)} onChange={changeCapacity} />
+      {isDatabase(component.type) && <InputField id="component-shards" label={playgroundCopy.shards} type="number" min={1} max={128} step={1}
+        required value={numericValue(settings.shards)} onChange={changeShards} />}
+      {component.type === 'Cache' && <>
+        <InputField id="component-ttl" label={playgroundCopy.ttl} type="number" min={0} max={86400} step={1}
+          required value={numericValue(settings.ttlSeconds)} onChange={changeTtl} />
+        <SelectField id="component-policy" label={playgroundCopy.cachePolicy} value={settings.cachePolicy} onChange={changePolicy}>
+          <option value="cache-aside">{playgroundCopy.cacheAside}</option>
+          <option value="write-through">{playgroundCopy.writeThrough}</option>
+        </SelectField>
+      </>}
+      {(component.type === 'App Server' || component.type === 'Worker') && (
+        <SelectField id="component-stateless" label={playgroundCopy.stateless} value={String(settings.stateless)} onChange={changeStateless}>
+          <option value="true">{playgroundCopy.statelessOption}</option>
+          <option value="false">{playgroundCopy.stateful}</option>
+        </SelectField>
+      )}
+      <p className="muted small">{playgroundCopy.configurationHelp}</p>
+      <div className="position-fields">
+        <div><InputField id="component-x" label={playgroundCopy.x} type="number" min={0} max={10000} step={1}
+          required value={numericValue(position.x)} onChange={changeX} /></div>
+        <div><InputField id="component-y" label={playgroundCopy.y} type="number" min={0} max={10000} step={1}
+          required value={numericValue(position.y)} onChange={changeY} /></div>
+      </div>
       <div className="flex flex-wrap gap-3">
         <Button disabled={!component.name.trim()}>{gameCopy.save}</Button>
         <Button variant="secondary" type="button" onClick={onCancel}>{gameCopy.cancel}</Button>

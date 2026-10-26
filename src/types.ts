@@ -7,6 +7,8 @@ export interface Topic {
   sections: { heading: string; body: string }[]
   example: string
   takeaway: string
+  level?: 'Beginner' | 'Intermediate' | 'Advanced'
+  sources?: { title: string; url: string; publisher: string }[]
 }
 
 export interface QuizQuestion {
@@ -19,14 +21,32 @@ export interface QuizQuestion {
   explanation: string
 }
 
-export const componentTypes = ['Client', 'Load Balancer', 'App Server', 'Cache', 'SQL DB', 'Queue'] as const
+export const componentTypes = ['Client', 'Load Balancer', 'App Server', 'Cache', 'SQL DB', 'Queue', 'NoSQL DB', 'Object Storage', 'CDN', 'Worker'] as const
 export type ComponentType = (typeof componentTypes)[number]
+
+export type Difficulty = 'Easy' | 'Medium' | 'Hard'
+
+export interface Position {
+  x: number
+  y: number
+}
+
+export interface ComponentSettings {
+  technology?: string
+  capacity?: number
+  shards?: number
+  ttlSeconds?: number
+  cachePolicy?: 'cache-aside' | 'write-through'
+  stateless?: boolean
+}
 
 export interface GameComponent {
   id: string
   name: string
   type: ComponentType
   replicas: number
+  position?: Position
+  settings?: ComponentSettings
 }
 
 export interface Connection {
@@ -41,13 +61,13 @@ export interface Board {
 }
 
 export type TaskRule =
-  | { kind: 'component'; type: ComponentType; minReplicas?: number; label: string }
+  | { kind: 'component'; type: ComponentType; minReplicas?: number; minCapacity?: number; minShards?: number; cachePolicy?: ComponentSettings['cachePolicy']; stateless?: boolean; label: string }
   | { kind: 'connection'; from: ComponentType; to: ComponentType; label: string }
 
 export interface TaskDefinition {
   id: string
   title: string
-  difficulty: 'Easy'
+  difficulty: Difficulty
   entryType: ComponentType
   description: string
   hint: string
@@ -59,4 +79,20 @@ export interface ValidationResult {
   score: number
   total: number
   checks: { label: string; passed: boolean; feedback: string }[]
+}
+
+export interface FlowStep {
+  id: string
+  from: string
+  to: string
+  depth: number
+  rate: number
+  capacity: number
+  overloaded: boolean
+}
+
+export interface FlowResult {
+  steps: FlowStep[]
+  unreachable: string[]
+  truncated: boolean
 }

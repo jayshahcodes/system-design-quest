@@ -1,6 +1,7 @@
 import { topics } from '../../data/topics'
 import { componentTypes } from '../../types'
 import type { GameComponent, Topic, ComponentType } from '../../types'
+import { learningLevels } from '../../constants'
 
 function renderTopic(topic: Topic) {
   return (
@@ -9,7 +10,15 @@ function renderTopic(topic: Topic) {
 }
 
 export function TopicOptions() {
-  return <>{topics.map(renderTopic)}</>
+  function renderGroup(level: (typeof learningLevels)[number]) {
+    function hasLevel(topic: Topic) {
+      return (topic.level ?? learningLevels[0]) === level
+    }
+
+    return <optgroup key={level} label={level}>{topics.filter(hasLevel).map(renderTopic)}</optgroup>
+  }
+
+  return <>{learningLevels.map(renderGroup)}</>
 }
 
 function renderType(type: ComponentType) {

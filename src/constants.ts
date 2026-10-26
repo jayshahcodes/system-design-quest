@@ -11,6 +11,7 @@ export type NavigationItem = (typeof sections)[number]
 export const symbols = { arrow: '↗', right: '→', seed: '✳', quiz: '✧', game: '⌘', plus: '+', check: '✓', circle: '○', breadcrumb: '/ ', space: ' ' }
 export const componentIcons: Record<ComponentType, string> = {
   Client: '▣', 'Load Balancer': '⑂', 'App Server': '▤', Cache: 'ϟ', 'SQL DB': '▱', Queue: '≋',
+  'NoSQL DB': '▦', 'Object Storage': '▧', CDN: '◎', Worker: '⚙',
 }
 
 export const appCopy = {
@@ -25,10 +26,10 @@ export const appCopy = {
   bigSystems: 'Big systems.',
   smallSteps: 'Small steps.',
   note: 'Every great architecture starts with understanding the basics.',
-  phase: 'PHASE 01 · FOUNDATIONS',
+  phase: 'LEARN · BUILD · EXPLORE',
   nextChapter: ' Your next chapter starts here',
   journey: 'YOUR JOURNEY ',
-  track: ' Beginner track ',
+  track: ' Beginner → Advanced ',
   avatar: 'Y',
   footer: 'Built for curious minds.',
 }
@@ -43,7 +44,7 @@ export const learnCopy = {
   titleAccent: 'Start here.',
   intro: 'Understand the ideas behind the systems you use every day.',
   introNext: ' One concept at a time, at your own pace.',
-  outline: 'BEGINNER FRIENDLY ↗',
+  outline: 'FOUNDATIONS TO ADVANCED ↗',
   firstQuest: 'YOUR FIRST QUEST',
   heroTitle: 'From “how does it work?”',
   heroTitleNext: 'to “I can build that.”',
@@ -53,11 +54,13 @@ export const learnCopy = {
   server: 'SERVER',
   database: 'DATABASE',
   diagramCaption: 'A little curiosity. A lot of connections.',
-  toolkit: 'Your foundation toolkit ',
-  count: '05',
-  essentials: 'Five essentials. A solid place to begin.',
-  range: '01 — 05',
-  level: '· Beginner',
+  toolkit: 'Your system design toolkit ',
+  essentials: 'Start with the foundations, then explore the trade-offs behind larger systems.',
+  filter: 'Learning level',
+  allLevels: 'All levels',
+  sources: 'Explore the original sources',
+  sourceNote: 'These public sources describe specific systems and points in time. The lessons summarize their ideas; examples and game quests are simplified exercises, not replicas of current company infrastructure.',
+  empty: 'No topics at this level yet.',
   lessMemorizing: 'Less memorizing.',
   moreMaking: 'More making.',
   connectDots: 'Ready to connect the dots?',
@@ -74,9 +77,9 @@ export const quizCopy = {
   titleAccent: 'A deeper understanding.',
   intro: 'Short questions, real scenarios, and a lesson in every answer.',
   ready: 'Ready for a knowledge check?',
-  description: 'Choose a topic or practice all five. You’ll see an explanation after each answer.',
+  description: 'Choose a topic at any level or practice them all. You’ll see an explanation after each answer.',
   area: 'Practice area',
-  allTopics: 'All foundation topics',
+  allTopics: 'All learning topics',
   start: 'Start Quiz ↗',
   complete: 'QUEST COMPLETE',
   perfect: 'You’ve got the foundations!',
@@ -162,7 +165,21 @@ export function lessonEyebrow(minutes: number) {
 }
 
 export function topicNumber(index: number) {
-  return `0${index + 1}`
+  return String(index + 1).padStart(2, '0')
+}
+
+export const learningLevels = ['Beginner', 'Intermediate', 'Advanced'] as const
+
+export function learningLevel(level: string) {
+  return `· ${level}`
+}
+
+export function topicCount(count: number) {
+  return String(count).padStart(2, '0')
+}
+
+export function topicRange(count: number) {
+  return count ? `01 — ${topicCount(count)}` : '—'
 }
 
 export function readingTime(minutes: number) {

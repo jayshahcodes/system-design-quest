@@ -15,7 +15,8 @@ function board(types: ComponentType[], edges: [number, number][], replicas = 1):
 }
 
 test('every topic has a concept and scenario question with valid answers', () => {
-  assert.equal(topics.length, 5)
+  assert.equal(topics.filter((topic) => topic.level === 'Beginner').length, 5)
+  assert.ok(topics.length > 5)
   assert.equal(new Set(questions.map((question) => question.id)).size, questions.length)
   for (const topic of topics) {
     assert.ok(topic.sections.length > 0)

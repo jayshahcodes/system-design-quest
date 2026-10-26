@@ -1,0 +1,38 @@
+.game-layout, .game-layout > *, .architecture-workspace { min-width: 0; }
+.architecture-workspace { margin: 18px 0; }
+.canvas-scroll { max-width: 100%; max-height: 650px; overflow: auto; border: 1px solid #d5dfcc; border-radius: 10px; background: #f6f8f1; overscroll-behavior: contain; }
+.canvas-surface { position: relative; background-image: radial-gradient(#d0dbc5 1px, transparent 1px); background-size: 20px 20px; isolation: isolate; }
+.canvas-edges { position: absolute; inset: 0; color: #6f835a; pointer-events: none; overflow: visible; }
+.canvas-edge > path { fill: none; stroke: currentColor; stroke-width: 2; }
+.canvas-node { position: absolute; width: 210px; height: 140px; background: #fffffc; border: 1px solid #cfdcc3; border-radius: 8px; box-shadow: 0 3px 8px #3443280a; }
+.canvas-node .component-card { height: 110px; border: 0; padding: 7px 12px; background: transparent; }
+.canvas-node .component-card h3 { margin: 0 0 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.canvas-node .component-card p { margin: 0 0 4px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.node-handle { display: block; width: 100%; height: 28px; padding: 3px 10px; background: #eaf0e1; color: #425732; border: 0; border-radius: 8px 8px 0 0; text-align: left; font-size: 11px; cursor: grab; touch-action: auto; }
+.node-handle:active { cursor: grabbing; }
+.node-handle:focus-visible, .canvas-scroll:focus-visible { outline: 3px solid #6a8f3d; outline-offset: 2px; }
+.flow-node-active { border: 2px solid #4d7c27; box-shadow: 0 0 0 4px #87ab4e33; }
+.flow-edge-active { color: #3b6f1b; }
+.flow-edge-active > path { stroke-width: 4; stroke-dasharray: 9 5; animation: flow-dash 1s linear infinite; }
+.flow-pulse { fill: #3b6f1b; }
+.edit-form > label { display: block; margin-top: 14px; }
+.edit-form > p { margin-top: 8px; }
+.position-fields, .flow-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.position-fields label, .flow-controls label { display: block; margin-bottom: 7px; }
+.flow-panel { margin-top: 20px; }
+.flow-panel h2 { margin-bottom: 10px; }
+.flow-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; align-items: end; margin-top: 18px; }
+.flow-navigation { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }
+.flow-current { background: #f0f4e9; border-radius: 8px; padding: 14px; }
+.flow-current p { margin: 6px 0; }
+.flow-steps { padding-left: 25px; max-height: 260px; overflow: auto; margin: 16px 0; }
+.flow-steps li { padding: 8px; font-size: 12px; }
+.flow-steps strong { display: block; }
+.flow-step-current { background: #edf3df; border-left: 3px solid #679337; }
+@keyframes flow-dash { to { stroke-dashoffset: -28; } }
+@media (prefers-reduced-motion: reduce) { .flow-edge-active > path { animation: none; } }
+@media (max-width: 640px) {
+  .flow-controls, .position-fields { grid-template-columns: 1fr; }
+  .canvas-scroll { max-height: 520px; }
+  .flow-controls > button { width: 100%; }
+}

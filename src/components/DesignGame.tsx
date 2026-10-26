@@ -1,11 +1,17 @@
 import { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { tasks } from '../data/tasks'
-import type { Board, ComponentType, Connection, GameComponent, TaskDefinition, ValidationResult } from '../types'
+import type { Board, ComponentType, Connection, FlowResult, GameComponent, Position, TaskDefinition, ValidationResult } from '../types'
 import { emptyBoard, loadBoard, saveBoard } from '../lib/storage'
 import { validateBoard } from '../lib/validation'
-import { componentAdded, componentName, gameCopy, symbols, taskOption } from '../constants'
-import { ComponentCard, ComponentEditor, ComponentLibrary, Connections, TaskBrief, ValidationPanel } from './GameParts'
+import { componentAdded, componentName, gameCopy, symbols } from '../constants'
+import { ComponentEditor, ComponentLibrary, Connections, TaskBrief, ValidationPanel } from './GameParts'
+import { ArchitectureCanvas } from './ArchitectureCanvas'
+import { FlowPanel } from './FlowPanel'
+import { getPosition, getSettings } from '../lib/architecture'
+import { traceFlow } from '../lib/flow'
+import { playgroundCopy, playgroundTaskOption } from '../gameConstants'
+import '../game.css'
 import { Badge } from './shared/Badge'
 import { Button } from './shared/Button'
 import { SelectField } from './shared/Fields'
@@ -17,7 +23,7 @@ export function DesignGame() {
 }
 
 function renderTask(task: TaskDefinition, index: number) {
-  return <option key={task.id} value={task.id}>{taskOption(index, task.title)}</option>
+  return <option key={task.id} value={task.id}>{playgroundTaskOption(index, task.title, task.difficulty)}</option>
 }
 
 function GameBoard({ taskId, onTask }: { taskId: string; onTask: (id: string) => void }) {
@@ -38,14 +44,27 @@ function GameBoard({ taskId, onTask }: { taskId: string; onTask: (id: string) =>
   const [message, setMessage] = useState('')
   const [storageError, setStorageError] = useState(false)
   const [confirmReset, setConfirmReset] = useState(false)
+  const [flowResult, setFlowResult] = useState<FlowResult | null>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  function resetFlow() {
+    setFlowResult(null)
+    setActiveIndex(0)
+  }
+
+  function trace(entryId: string, rate: number) {
+    setFlowResult(traceFlow(board, entryId, rate))
+    setActiveIndex(0)
+  }
 
   function update(next: Board) {
     setBoard(next)
     setResult(null)
+    resetFlow()
     setStorageError(!saveBoard(taskId, next))
   }
 
-  function add(type: ComponentType) {
+  function add(type: ComponentType, position?: Position) {
     function hasType(component: GameComponent) {
       return component.type === type
     }
@@ -57,9 +76,24 @@ function GameBoard({ taskId, onTask }: { taskId: string; onTask: (id: string) =>
         name: componentName(type, board.components.filter(hasType).length + 1),
         type,
         replicas: 1,
+        position: position ?? getPosition({ id: '', name: '', type, replicas: 1 }, board.components.length),
       }],
     })
     setMessage(componentAdded(type))
+  }
+
+  function move(id: string, position: Position) {
+    function moveComponent(component: GameComponent) {
+      return component.id === id ? { ...component, position } : component
+    }
+    update({ ...board, components: board.components.map(moveComponent) })
+    if (editing?.id === id) setEditing({ ...editing, position })
+  }
+
+  function edit(component: GameComponent) {
+    function matches(item: GameComponent) { return item.id === component.id }
+    const index = board.components.findIndex(matches)
+    setEditing({ ...component, position: getPosition(component, index) })
   }
 
   function addClient() {
@@ -97,6 +131,17 @@ function GameBoard({ taskId, onTask }: { taskId: string; onTask: (id: string) =>
     event.preventDefault()
     if (!editing) return
     const edited = editing
+    const settings = getSettings(edited)
+    const position = getPosition(edited, 0)
+    function inBounds(value: number, min: number, max: number) {
+      return Number.isInteger(value) && value >= min && value <= max
+    }
+    if (!edited.name.trim() || edited.name.trim().length > 80 || !inBounds(edited.replicas, 1, 100) ||
+      !inBounds(settings.capacity, 1, 100000) || !inBounds(settings.shards, 1, 128) ||
+      !inBounds(settings.ttlSeconds, 0, 86400) || !inBounds(position.x, 0, 10000) || !inBounds(position.y, 0, 10000)) {
+      setMessage(playgroundCopy.invalid)
+      return
+    }
 
     function replaceEdited(component: GameComponent) {
       return component.id === edited.id ? { ...edited, name: edited.name.trim() } : component
@@ -157,10 +202,6 @@ function GameBoard({ taskId, onTask }: { taskId: string; onTask: (id: string) =>
     setMessage(gameCopy.taskReset)
   }
 
-  function renderComponent(component: GameComponent) {
-    return <ComponentCard key={component.id} component={component} onEdit={setEditing} onRemove={remove} />
-  }
-
   return (
     <div className="page-content">
       <PageHeader
@@ -180,16 +221,16 @@ function GameBoard({ taskId, onTask }: { taskId: string; onTask: (id: string) =>
             <h2>{gameCopy.architecture}<Badge variant="count-badge">{board.components.length}</Badge></h2>
             <span className="muted small">{gameCopy.flow}</span>
           </div>
-          {board.components.length === 0 ? (
+          {board.components.length === 0 && (
             <div className="empty-state">
               <span>{symbols.game}</span>
               <h3>{gameCopy.blank}</h3>
               <p>{gameCopy.addPrompt}</p>
               <Button variant="secondary" onClick={addClient}>{gameCopy.addClient}</Button>
             </div>
-          ) : (
-            <div className="board-grid">{board.components.map(renderComponent)}</div>
           )}
+          <ArchitectureCanvas board={board} activeStep={flowResult?.steps[activeIndex] ?? null}
+            onAdd={add} onMove={move} onEdit={edit} onRemove={remove} />
           {editing && (
             <ComponentEditor component={editing} onChange={setEditing} onSave={saveComponent} onCancel={cancelEditing} />
           )}
@@ -205,6 +246,8 @@ function GameBoard({ taskId, onTask }: { taskId: string; onTask: (id: string) =>
           />
         </section>
       </div>
+      <FlowPanel board={board} entryType={task.entryType} result={flowResult} activeIndex={activeIndex}
+        onTrace={trace} onStep={setActiveIndex} onReset={resetFlow} />
       <div className="game-actions">
         <Button onClick={validate}>{gameCopy.validate}</Button>
         <Button variant="secondary" onClick={requestReset}>{gameCopy.reset}</Button>

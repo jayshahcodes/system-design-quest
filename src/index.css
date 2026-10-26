@@ -191,6 +191,14 @@ details p { margin-top: 10px; }
 .reset-confirm button + button { margin-left: 20px; }
 .skip-link { position: fixed; top: -70px; left: 15px; z-index: 10; background: #fff; padding: 12px; border: 2px solid #254f3e; }
 .skip-link:focus { top: 10px; }
+.learning-filter { max-width: 300px; margin: -5px 0 22px; }
+.topic-card .topic-level { display: inline; margin-left: 4px; }
+.topic-card-bottom > span:first-child { display: flex; flex-wrap: wrap; gap: 4px; }
+.lesson-sources { padding: 20px; background: #f0f3e9; border-radius: 8px; }
+.lesson-sources ul { list-style: disc; padding-left: 20px; margin-top: 14px; }
+.lesson-sources li { margin-top: 12px; }
+.lesson-sources a { display: block; font-size: 13px; color: #31593f; text-decoration: underline; overflow-wrap: anywhere; }
+.lesson-sources li > span { display: block; margin-top: 3px; }
 @media (min-width: 1500px) { .sidebar { width: 280px; padding-left: 32px; padding-right: 32px; } .page-content { padding-top: 55px; } .topic-card { min-height: 230px; } }
 @media (max-width: 1150px) { .sidebar { width: 215px; padding-left: 16px; padding-right: 16px; } .page-content { padding: 32px 28px; } .topbar { padding: 0 28px; } .page-footer { margin: 0 28px; } .hero-diagram { gap: 5px; } .diagram-node { width: 54px; height: 67px; font-size: 25px; } .diagram-node span { font-size: 6px; } .hero-banner { padding: 26px; } .hero-banner h2 { font-size: 25px; } .outline-label { display: none; } .topic-card { padding: 16px; } .topic-level { display: none; } .game-layout { grid-template-columns: 175px minmax(0, 1fr); } .library { padding: 12px; } }
 @media (max-width: 900px) { .topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .hero-diagram { display: none; } .task-brief { grid-template-columns: 1fr; gap: 20px; } .requirements { border-left: 0; border-top: 1px solid #e2e7d9; padding: 15px 0 0; } .game-layout { grid-template-columns: 1fr; } .library { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 16px; } .library h2, .library > p { grid-column: 1 / -1; } .library-button { margin: 0; } .bottom-note { flex-wrap: wrap; } }

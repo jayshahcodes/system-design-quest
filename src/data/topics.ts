@@ -1,8 +1,9 @@
 import type { Topic } from '../types'
+import { advancedTopics } from './advancedTopics.ts'
 
 export const topics: Topic[] = [
   {
-    id: 'client-server', title: 'Client–server basics', icon: '↔', minutes: 5,
+    id: 'client-server', title: 'Client–server basics', icon: '↔', minutes: 5, level: 'Beginner',
     summary: 'Meet the two sides of every web interaction.',
     sections: [
       { heading: 'A conversation with two roles', body: 'A client requests a service. A server receives the request, performs work, and sends a response. Your browser is a client; the machine serving a website acts as a server. These are roles, not necessarily different kinds of hardware.' },
@@ -13,7 +14,7 @@ export const topics: Topic[] = [
     takeaway: 'Trace who sends the request, who handles it, and what comes back.',
   },
   {
-    id: 'http', title: 'HTTP & APIs', icon: '{ }', minutes: 6,
+    id: 'http', title: 'HTTP & APIs', icon: '{ }', minutes: 6, level: 'Beginner',
     summary: 'Understand the contract between clients and services.',
     sections: [
       { heading: 'Requests and responses', body: 'HTTP is a protocol for exchanging messages. A request has a method, URL, headers, and sometimes a body. A response has a status code, headers, and often a body. HTTPS adds encryption in transit.' },
@@ -24,7 +25,7 @@ export const topics: Topic[] = [
     takeaway: 'A clear API defines inputs, outputs, errors, and the meaning of each operation.',
   },
   {
-    id: 'dns', title: 'DNS basics', icon: '◎', minutes: 4,
+    id: 'dns', title: 'DNS basics', icon: '◎', minutes: 4, level: 'Beginner',
     summary: 'How a friendly domain becomes a network address.',
     sections: [
       { heading: 'The internet’s directory', body: 'DNS maps names such as example.com to records, including IP addresses. Before connecting to a service, a client typically asks a DNS resolver for the address. DNS does not fetch the web page itself.' },
@@ -35,7 +36,7 @@ export const topics: Topic[] = [
     takeaway: 'DNS resolves the name; HTTP carries the application conversation.',
   },
   {
-    id: 'databases', title: 'SQL vs NoSQL', icon: '▤', minutes: 7,
+    id: 'databases', title: 'SQL vs NoSQL', icon: '▤', minutes: 7, level: 'Beginner',
     summary: 'Choose storage around your data and access patterns.',
     sections: [
       { heading: 'Relational databases', body: 'SQL databases organize data into tables with defined schemas. Keys and joins connect records. Transactions can group changes atomically, which is useful when several related updates must succeed or fail together.' },
@@ -46,7 +47,7 @@ export const topics: Topic[] = [
     takeaway: 'Explain your access patterns before choosing a database.',
   },
   {
-    id: 'performance', title: 'Latency vs throughput', icon: '↗', minutes: 5,
+    id: 'performance', title: 'Latency vs throughput', icon: '↗', minutes: 5, level: 'Beginner',
     summary: 'Separate how fast one request is from how much work gets done.',
     sections: [
       { heading: 'Two different measurements', body: 'Latency is the time one operation takes, often measured in milliseconds. Throughput is the amount of work completed per unit of time, such as requests per second. Concurrent users are not the same as requests per second.' },
@@ -56,4 +57,5 @@ export const topics: Topic[] = [
     example: 'A checkout API might handle 1,000 requests per second with p95 latency of 180 ms. Those numbers describe different properties.',
     takeaway: 'Ask both “How long does it take?” and “How much can we handle?”',
   },
+  ...advancedTopics,
 ]

@@ -1,6 +1,6 @@
 # System Design Quest
 
-An interactive, beginner-friendly system design learning platform. Learn the foundations, practice with short quizzes, and build architectures through guided design quests.
+An interactive system design learning platform, from beginner foundations to advanced trade-offs. Learn concepts and public engineering case studies, practice with short quizzes, and build architectures through guided design quests.
 
 ## Run locally
 
@@ -20,14 +20,17 @@ npm run build    # TypeScript checks and production bundle in dist/
 npm run preview  # Serve the production bundle locally
 ```
 
-## Phase 1 features
+## Features
 
-- **Learn:** five structured beginner lessons: client–server, HTTP/APIs, DNS, SQL vs NoSQL, and latency vs throughput. Each includes an example and takeaway.
-- **Quiz:** ten topic-mapped concept/scenario MCQs. Practice one topic or all topics, check answers with explanations, advance, and review your final score.
-- **Design Game:** add Client, Load Balancer, App Server, Cache, SQL DB, and Queue blocks. Edit names, types, and replicas (1–100); delete blocks; create/remove directed connections.
-- **Three easy quests:** serve a static site, prepare for 10,000 users with load balancing/replicas, and design a URL shortener with SQL storage and a cache.
-- **Actionable validation:** pass/fail and a requirements-met breakdown. Connections must point in the required direction, connect components meeting the task's replica requirements, and be reachable from the task's entry component through required connection types.
-- **Local persistence:** boards save independently per task and survive reloads. Reset Task clears only the selected board after confirmation. Missing/corrupt saved boards fall back to empty; storage write failures display a warning and do not stop play.
+- **Learn:** 13 lessons across Beginner, Intermediate, and Advanced levels. Foundations are followed by load balancing, caching, queues, CDNs, sharding, consistency, graph/feed design, and distributed IDs. Filter by level and follow the original sources from case-study lessons.
+- **Quiz:** 26 topic-mapped concept/scenario MCQs. Practice one topic or all topics, check answers with explanations, advance, and review your final score.
+- **Visual Design Game:** add ten component types, including NoSQL DB, Object Storage, CDN, and Worker. Drag a library block onto the board, move nodes by their drag handle, and follow directed SVG connections. Click-to-add, keyboard movement, and editor X/Y coordinates provide non-drag alternatives.
+- **Technology choices:** compare curated popular tools such as PostgreSQL/MySQL, Redis/Memcached, MongoDB/DynamoDB, Kafka/RabbitMQ, Nginx/HAProxy, and object-storage/CDN options. Selections are learning annotations with trade-off descriptions, not integrations, endorsements, or rankings.
+- **Configure the system:** edit names, types, replicas (1–100), per-replica illustrative capacity (1–100,000), database shards (1–128), cache TTL (0–86,400 seconds) and policy, or stateless server/worker behavior. Type changes reset incompatible settings.
+- **Seven progressive quests:** three Easy (website, load-balanced app, URL shortener), two Medium (upload processing, cached/sharded feed), and two Hard (video delivery, searchable catalog).
+- **Actionable validation:** pass/fail and a requirements-met breakdown. Required settings and directed connections must be reachable through the task's required topology; disconnected configured blocks cannot satisfy the newer configuration rules.
+- **Flow explorer:** choose an entry component and illustrative request rate, trace the reachable directed edges, and step forward/backward to highlight a connection and its endpoints. Compare the rate to each target's configured replica capacity; disconnected nodes and capped traces are reported.
+- **Local persistence:** boards, positions, and settings save independently per task and survive reloads. Existing Phase 1 boards still load with default positions/settings. Reset Task clears only the selected board after confirmation. Missing/corrupt saved boards fall back to empty; storage write failures display a warning and do not stop play.
 - Responsive layout, keyboard-operable controls, labeled inputs, and helpful empty states.
 
 ### Try a first quest
@@ -38,7 +41,18 @@ npm run preview  # Serve the production bundle locally
 4. Select **Run Validation**. The three requirements should pass.
 5. Try the next task: put a Load Balancer between the client and server, and edit the connected App Server to use at least two replicas.
 
-**Scope:** Phase 1 evaluates structural requirements, not real traffic, latency, cost, availability, or production readiness. “10,000 users” is a learning scenario, not a measured capacity guarantee. App Server also represents a simple static file server in the first quest. Examples are simplified educational designs, not claims about any company's internal architecture.
+### Explore beyond the first quest
+
+- Drag blocks from the component library onto the architecture surface; use the handle to reposition them. Use arrow keys on the focused handle or edit X/Y coordinates when using a keyboard or touch device.
+- Edit a SQL/NoSQL block to choose a database and change shard count. Edit Cache for TTL/policy, or App Server/Worker for capacity and stateless behavior.
+- Connect nodes using the **From / To** form. Trace the request path from a selected source and step through the directed edges; then increase the offered rate or replica capacity and compare the illustrative overload indicators.
+- Move from Easy to Medium/Hard tasks using the task selector. Hints and rule labels describe the required topology and configuration.
+
+**Scope:** Validation checks educational structure/settings, not production readiness. The flow explorer is a breadth-first traversal, **not a discrete-event traffic simulator**: every reachable edge gets the same illustrative rate; load-balancer splitting, cache hit/miss rates, TTL expiration, shard routing, queue scheduling, latency, consistency, and failures are not simulated. A target's capacity is simply replicas × configured capacity, not a benchmark for the chosen tool. Cycles are visited finitely and traces display at most 200 edges. “10,000 users” is a learning scenario, not a measured capacity guarantee. App Server also represents a simple static file server in the first quest.
+
+### Public case studies
+
+Lessons link to Netflix's Open Connect overview, the Google Spanner paper, the Vitess project (which originated at YouTube), Meta's TAO paper, and Twitter's archived Snowflake project. They distinguish published/historical designs from proposed learning exercises. These sources describe specific contexts and points in time; the game does not reproduce those companies' current internals. External source availability is outside this app.
 
 Boards stay in this browser/origin under `system-design-quest:board:v1:<task-id>` localStorage keys. They are not synced or backed up, so avoid storing sensitive information. Quiz progress resets when leaving Quiz or reloading.
 
@@ -48,13 +62,19 @@ Boards stay in this browser/origin under `system-design-quest:board:v1:<task-id>
 src/
   App.tsx              Navigation and app shell
   components/          Learn, Quiz, and DesignGame sections
+    ArchitectureCanvas.tsx  Drag/drop nodes, keyboard movement, and directed edges
+    FlowPanel.tsx       Traversal controls and step-by-step flow explanations
     shared/            Reusable buttons, badges, headers, fields, and options
   constants.ts         UI copy, icons, navigation, and copy formatters
-  data/                Topics, quiz questions, and task definitions
+  gameConstants.ts     Playground copy and flow/configuration labels
+  data/                Topics, quiz questions, tasks, and technology catalog
+  lib/architecture.ts  Default settings and legacy node placement
+  lib/flow.ts          Bounded, cycle-safe directed request traversal
   lib/storage.ts       Defensive board parsing and localStorage access
   lib/validation.ts    Pure data-driven task evaluation
   types.ts             Shared content, board, task, and result interfaces
   index.css            Tailwind integration and responsive styles
+  game.css             Visual playground and flow styling
 tests/                 Content, validation, persistence, copy, and JSX convention tests
 ```
 
@@ -62,7 +82,7 @@ The app uses React, TypeScript, Vite, and Tailwind CSS, with a simple single-pag
 
 ## Next phases
 
-- Medium/hard tasks: uploads, messaging, video delivery, and multi-region systems.
-- Measured traffic simulation, failure injection, and explicit cost/latency trade-offs.
-- Visual graph editing, hints, reference solutions, and learning milestones.
+- More tasks: messaging, multi-region failover, and explicit security invariants.
+- Real workload simulation, failure injection, cache/shard behavior, and cost/latency trade-offs.
+- Connection-port gestures, automatic graph layout, reference solutions, and learning milestones.
 - Optional accounts, cloud persistence, and sharing.
