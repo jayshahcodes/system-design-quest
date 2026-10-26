@@ -48,12 +48,14 @@ Boards stay in this browser/origin under `system-design-quest:board:v1:<task-id>
 src/
   App.tsx              Navigation and app shell
   components/          Learn, Quiz, and DesignGame sections
+    shared/            Reusable buttons, badges, headers, fields, and options
+  constants.ts         UI copy, icons, navigation, and copy formatters
   data/                Topics, quiz questions, and task definitions
   lib/storage.ts       Defensive board parsing and localStorage access
   lib/validation.ts    Pure data-driven task evaluation
   types.ts             Shared content, board, task, and result interfaces
   index.css            Tailwind integration and responsive styles
-tests/                 Content, validation, and persistence regression tests
+tests/                 Content, validation, persistence, copy, and JSX convention tests
 ```
 
 The app uses React, TypeScript, Vite, and Tailwind CSS, with a simple single-page navigation structure. Add lessons/questions in `src/data/`; add tasks using the existing component/connection rule types. New rule kinds belong in `TaskRule` and the validator. `npm test` exercises the pure modules directly using Node's TypeScript stripping.

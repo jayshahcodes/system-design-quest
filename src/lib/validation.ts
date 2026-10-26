@@ -1,4 +1,5 @@
 import type { Board, ComponentType, TaskDefinition, ValidationResult } from '../types.ts'
+import { requirementFeedback, validationCopy } from '../constants.ts'
 
 export function validateBoard(board: Board, task: TaskDefinition): ValidationResult {
   const requiredReplicas = (type: ComponentType) => Math.max(1, ...task.rules
@@ -29,7 +30,7 @@ export function validateBoard(board: Board, task: TaskDefinition): ValidationRes
       ? board.components.some((component) => component.type === rule.type && component.replicas >= (rule.minReplicas ?? 1))
       : edges.some((connection) => reachable.has(connection.from)
         && eligible.get(connection.from)?.type === rule.from && eligible.get(connection.to)?.type === rule.to)
-    return { label: rule.label, passed, feedback: passed ? 'Requirement met.' : `${rule.label}. Add or edit the relevant components and directed connections; keep them reachable from a ${task.entryType}.` }
+    return { label: rule.label, passed, feedback: passed ? validationCopy.met : requirementFeedback(rule.label, task.entryType) }
   })
   const score = checks.filter((check) => check.passed).length
   return { passed: score === checks.length, score, total: checks.length, checks }
