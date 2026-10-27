@@ -12,7 +12,7 @@ export interface Topic {
   exercise?: { prompt: string; checkpoints: string[] }
 }
 
-export type ResourcePublisher = 'Netflix' | 'Jio ecosystem' | 'Amazon / AWS' | 'Google'
+export type ResourcePublisher = 'Netflix' | 'Jio ecosystem' | 'Amazon / AWS' | 'Google' | 'SystemDesign.io' | 'Fanout'
 
 export interface LearningResource {
   id: string
@@ -20,7 +20,7 @@ export interface LearningResource {
   url: string
   publisher: ResourcePublisher
   attribution: string
-  kind: 'Engineering article' | 'Engineering guide' | 'Project documentation' | 'Customer case study'
+  kind: 'Engineering article' | 'Engineering guide' | 'Project documentation' | 'Customer case study' | 'Learning directory'
   level: 'Intermediate' | 'Advanced'
   concepts: string[]
   summary: string

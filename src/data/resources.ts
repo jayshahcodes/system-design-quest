@@ -1,4 +1,5 @@
 import type { LearningResource } from '../types.ts'
+import { practiceResources } from './practiceResources.ts'
 
 const referenceNote = 'Reading reference only: the article body could not be retrieved in this environment. The guide contains general design questions, not a verified account of the article’s implementation details. Link availability is not monitored.'
 const retrievedNote = 'The public project README was retrieved during curation on 2026-10-27. The summary describes that documentation, not a live production deployment; link availability is not monitored.'
@@ -163,4 +164,5 @@ export const resources: LearningResource[] = [
     discussion: 'Can a reaction counter be approximate while a payment counter cannot? Explain how that difference changes retries, storage, and fan-out.',
     topicIds: ['live-event-fanout', 'graph-feeds'], verification: 'reference-only', verificationNote: hotstarNote,
   },
+  ...practiceResources,
 ]

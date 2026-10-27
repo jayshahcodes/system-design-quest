@@ -14,11 +14,11 @@ const newTopicIds = [
 ]
 
 test('resource curation covers all requested groups with attributed HTTPS references', () => {
-  assert.equal(resources.length, 12)
+  assert.equal(resources.length, 16)
   assert.equal(new Set(resources.map((resource) => resource.id)).size, resources.length)
   assert.equal(new Set(resources.map((resource) => resource.url)).size, resources.length)
   assert.deepEqual([...new Set(resources.map((resource) => resource.publisher))].sort(),
-    ['Amazon / AWS', 'Google', 'Jio ecosystem', 'Netflix'])
+    ['Amazon / AWS', 'Fanout', 'Google', 'Jio ecosystem', 'Netflix', 'SystemDesign.io'])
   for (const resource of resources) {
     const url = new URL(resource.url)
     assert.equal(url.protocol, 'https:')
@@ -53,8 +53,8 @@ test('retrieval labels separate fetched primary documentation from unavailable a
 
 test('new lessons preserve the existing curriculum and add sourced exercises and quizzes', () => {
   assert.deepEqual(topics.slice(0, originalTopicIds.length).map((topic) => topic.id), originalTopicIds)
-  assert.deepEqual(topics.slice(originalTopicIds.length).map((topic) => topic.id), newTopicIds)
-  assert.equal(questions.length, 42)
+  assert.deepEqual(topics.slice(originalTopicIds.length, originalTopicIds.length + newTopicIds.length).map((topic) => topic.id), newTopicIds)
+  assert.equal(questions.length, 54)
   for (const id of newTopicIds) {
     const topic = topics.find((item) => item.id === id)!
     assert.ok(topic.sources?.length)

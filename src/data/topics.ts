@@ -1,6 +1,7 @@
 import type { Topic } from '../types'
 import { advancedTopics } from './advancedTopics.ts'
 import { reliabilityTopics } from './reliabilityTopics.ts'
+import { practiceTopics } from './practiceTopics.ts'
 
 export const topics: Topic[] = [
   {
@@ -60,4 +61,5 @@ export const topics: Topic[] = [
   },
   ...advancedTopics,
   ...reliabilityTopics,
+  ...practiceTopics,
 ]

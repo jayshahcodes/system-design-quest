@@ -1,4 +1,5 @@
 import type { TaskDefinition } from '../types.ts'
+import { practiceTasks } from './practiceTasks.ts'
 
 export const tasks: TaskDefinition[] = [
   {
@@ -110,4 +111,5 @@ export const tasks: TaskDefinition[] = [
       { kind: 'connection', from: 'Worker', to: 'NoSQL DB', label: 'Connect Worker → NoSQL DB' },
     ],
   },
+  ...practiceTasks,
 ]

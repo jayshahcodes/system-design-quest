@@ -1,0 +1,88 @@
+import type { QuizQuestion } from '../types.ts'
+
+export const practiceQuestions: QuizQuestion[] = [
+  {
+    id: 'rate-limiting-identity', topicId: 'rate-limiting', kind: 'concept',
+    prompt: 'Which identity best enforces one request budget per workspace across its API keys?',
+    options: ['A workspace header accepted without verification', 'The verified workspace associated with the authenticated credential', 'A new random identifier on every request', 'Each application replica’s hostname'],
+    answer: 1,
+    explanation: 'Derive the workspace from trusted authentication and authorization state. A shared workspace budget prevents key rotation from multiplying the allowance; an unverified header lets callers choose their own budget.',
+  },
+  {
+    id: 'rate-limiting-replicas', topicId: 'rate-limiting', kind: 'scenario',
+    prompt: 'Three replicas each allow the same tenant 100 requests per minute independently. Traffic can reach all three. How should you enforce a tighter total of 100?',
+    options: ['Raise each local allowance to 300', 'Add replicas without changing the limiter', 'Coordinate atomic shared budgets or allocate bounded local leases', 'Use each request’s user-agent string as the tenant identity'],
+    answer: 2,
+    explanation: 'Independent buckets can admit up to 300 requests across the replicas. Shared atomic decisions or budget leases coordinate the total, with explicit latency, availability, and overshoot tradeoffs.',
+  },
+  {
+    id: 'pagination-indexes-order', topicId: 'pagination-indexes', kind: 'concept',
+    prompt: 'Why add a unique id after created_at in a descending keyset pagination order?',
+    options: ['It makes cursor contents confidential', 'It eliminates the need for query indexes', 'It prevents all changes to rows between pages', 'It resolves timestamp ties into a deterministic total order'],
+    answer: 3,
+    explanation: 'A unique tie-breaker gives each row a distinct ordered position and supports an unambiguous seek boundary. It does not encrypt the cursor or turn the listing into a snapshot.',
+  },
+  {
+    id: 'pagination-indexes-revocation', topicId: 'pagination-indexes', kind: 'scenario',
+    prompt: 'A user loses workspace access after receiving a valid signed pagination cursor. What should the next page request do?',
+    options: ['Recheck membership and deny access despite the valid cursor', 'Allow access until every cursor expires', 'Skip tenant filtering because the cursor is signed', 'Return rows from a different workspace to fill the page'],
+    answer: 0,
+    explanation: 'A signature protects cursor integrity, not current permission. Every page must reapply authorization and scope filters; an earlier cursor must not preserve revoked access.',
+  },
+  {
+    id: 'transaction-boundaries-outbox', topicId: 'transaction-boundaries', kind: 'concept',
+    prompt: 'What guarantee does writing a business change and an outbox row in the same database transaction provide?',
+    options: ['Every consumer receives the message exactly once', 'The local change and publication intent commit together', 'A remote charge rolls back if publication fails', 'No relay or consumer needs duplicate handling'],
+    answer: 1,
+    explanation: 'The transaction prevents a committed business change from lacking its publication intent. Relays can still publish twice after a crash, and remote effects remain outside the local transaction.',
+  },
+  {
+    id: 'transaction-boundaries-unknown-charge', topicId: 'transaction-boundaries', kind: 'scenario',
+    prompt: 'A payment worker times out after the provider may have accepted a charge. What is the safest next step?',
+    options: ['Retry with a fresh payment identity immediately', 'Assume timeout means the charge failed', 'Confirm the booking without checking payment state', 'Reconcile the outcome and retry using the same provider-supported idempotency key'],
+    answer: 3,
+    explanation: 'A timeout leaves the remote outcome unknown. A stable provider-supported operation identity and reconciliation avoid turning one intended payment into multiple charges.',
+  },
+  {
+    id: 'event-log-projections-checkpoint', topicId: 'event-log-projections', kind: 'concept',
+    prompt: 'Why commit a projection update and its processing checkpoint atomically?',
+    options: ['To establish global ordering across every partition', 'To remove all event-retention requirements', 'To avoid recording progress without its effect or replaying an unrecorded committed effect', 'To authorize every consumer to read private events'],
+    answer: 2,
+    explanation: 'Atomic progress and effect recording closes the local crash gap. It does not establish cross-partition order, authorize consumers, or solve external side-effect deduplication.',
+  },
+  {
+    id: 'event-log-projections-rebuild', topicId: 'event-log-projections', kind: 'scenario',
+    prompt: 'You must rebuild a shipment read model while live events continue. Which plan avoids exposing a partially rebuilt view?',
+    options: ['Replay into a separate version, catch up and validate, then switch reads at a defined boundary', 'Clear the live view and let users query it while replay runs', 'Replay all historical events through the notification sender', 'Advance every checkpoint to the log end before processing'],
+    answer: 0,
+    explanation: 'A separate projection keeps the existing view available until the replacement catches up and passes validation. Replay should not repeat external notifications, and checkpoints must reflect completed work.',
+  },
+  {
+    id: 'realtime-delivery-authorization', topicId: 'realtime-delivery', kind: 'concept',
+    prompt: 'What does successful authentication of a WebSocket connection establish?',
+    options: ['Permission to subscribe to every tenant channel', 'The connection identity, with channel authorization still required', 'Guaranteed durable delivery of every message', 'Permanent access even after membership revocation'],
+    answer: 1,
+    explanation: 'Authentication establishes identity. Each subscription and replay still needs authorization, and the service must handle expiry or revocation; WebSocket transport itself does not provide durable delivery.',
+  },
+  {
+    id: 'realtime-delivery-expired-resume', topicId: 'realtime-delivery', kind: 'scenario',
+    prompt: 'A reconnecting dispatch client supplies a last-applied position older than the retained event history. What should the server do?',
+    options: ['Silently start at the newest event and claim the client is current', 'Replay another tenant’s retained history instead', 'Keep appending new messages to an unbounded client queue', 'Require an authorized fresh snapshot with a defined boundary, then resume after it'],
+    answer: 3,
+    explanation: 'An expired replay position means a gap cannot be filled from retained events. Explicit resynchronization prevents silently inconsistent state, and a snapshot boundary connects the replacement state to subsequent events.',
+  },
+  {
+    id: 'geo-routing-authority', topicId: 'geo-routing', kind: 'concept',
+    prompt: 'Why is changing DNS insufficient to safely transfer regional write ownership?',
+    options: ['DNS automatically replicates every pending write', 'A low TTL guarantees every client switches immediately', 'Cached routes and existing connections can still reach an unfenced old writer', 'The nearest endpoint always owns the tenant’s data'],
+    answer: 2,
+    explanation: 'Routing changes do not revoke storage write authority. A promoted writer needs an ownership protocol and storage-enforced fencing so an old region cannot continue accepting writes under stale authority.',
+  },
+  {
+    id: 'geo-routing-fencing', topicId: 'geo-routing', kind: 'scenario',
+    prompt: 'During a partition, a standby cannot establish exclusive write authority and the old primary may still be active. Which response best protects a single-writer invariant?',
+    options: ['Refuse writes until authority and fencing can be established', 'Promote solely because one health check failed', 'Let clients choose a writable region in an unverified header', 'Accept writes in both regions and assume timestamps resolve every conflict'],
+    answer: 0,
+    explanation: 'Availability must yield when exclusive ownership cannot be established under a single-writer contract. Health checks and routing do not fence the old writer, and timestamps alone cannot safely reconcile arbitrary business invariants.',
+  },
+]

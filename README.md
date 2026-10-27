@@ -22,13 +22,13 @@ npm run preview  # Serve the production bundle locally
 
 ## Features
 
-- **Learn:** 21 lessons across Beginner, Intermediate, and Advanced levels. The original 13 lessons are preserved, with eight new lessons on retry budgets, idempotent workflows, fault isolation, adaptive concurrency, SLOs, overload control, failure domains, and live-event PubSub. New lessons include design exercises and reasoning checkpoints.
-- **Engineering resource library:** 12 curated references grouped by Netflix, Jio-related streaming, Amazon / AWS, and Google. Search titles, summaries, attribution, concepts, and takeaways; combine publisher and concept filters; expand reading guides and open related lessons directly.
-- **Quiz:** 42 topic-mapped concept/scenario MCQs. Practice one topic or all topics, check answers with explanations, advance, and review your final score.
+- **Learn:** 27 lessons across Beginner, Intermediate, and Advanced levels. The existing 21 lessons are preserved, with six original additions on rate limiting, pagination/indexes, transaction boundaries, event-log projections, realtime delivery, and geo routing. Extensions include design exercises and reasoning checkpoints.
+- **Engineering resource library:** 16 curated references grouped by Netflix, Jio-related streaming, Amazon / AWS, Google, SystemDesign.io, and Fanout. Search titles, summaries, attribution, concepts, and takeaways; combine publisher and concept filters; expand reading guides and open related lessons directly.
+- **Quiz:** 54 topic-mapped concept/scenario MCQs. Practice one topic or all topics, check answers with explanations, advance, and review your final score.
 - **Visual Design Game:** add ten component types, including NoSQL DB, Object Storage, CDN, and Worker. Drag a library block onto the board, move nodes by their drag handle, and follow directed SVG connections. Click-to-add, keyboard movement, and editor X/Y coordinates provide non-drag alternatives.
 - **Technology choices:** compare curated popular tools such as PostgreSQL/MySQL, Redis/Memcached, MongoDB/DynamoDB, Kafka/RabbitMQ, Nginx/HAProxy, and object-storage/CDN options. Selections are learning annotations with trade-off descriptions, not integrations, endorsements, or rankings.
 - **Configure the system:** edit names, types, replicas (1–100), per-replica illustrative capacity (1–100,000), database shards (1–128), cache TTL (0–86,400 seconds) and policy, or stateless server/worker behavior. Type changes reset incompatible settings.
-- **Seven progressive quests:** three Easy (website, load-balanced app, URL shortener), two Medium (upload processing, cached/sharded feed), and two Hard (video delivery, searchable catalog).
+- **Ten progressive quests:** the existing seven quests plus an Easy durable catalog, Medium durable notifications, and Hard event-driven read-model rebuild. New quests use existing components, settings, validation, and per-task persistence.
 - **Actionable validation:** pass/fail and a requirements-met breakdown. Required settings and directed connections must be reachable through the task's required topology; disconnected configured blocks cannot satisfy the newer configuration rules.
 - **Flow explorer:** choose an entry component and illustrative request rate, trace the reachable directed edges, and step forward/backward to highlight a connection and its endpoints. Compare the rate to each target's configured replica capacity; disconnected nodes and capped traces are reported.
 - **Local persistence:** boards, positions, and settings save independently per task and survive reloads. Existing Phase 1 boards still load with default positions/settings. Reset Task clears only the selected board after confirmation. Missing/corrupt saved boards fall back to empty; storage write failures display a warning and do not stop play.
@@ -70,6 +70,14 @@ The resource library adds:
 
 Add a record to `src/data/resources.ts` with its publisher group, actual attribution, kind, level, concepts, original summary, reading takeaways, discussion prompt, related topic IDs, and retrieval status/note. Add lessons in `src/data/reliabilityTopics.ts` and questions in `src/data/reliabilityQuestions.ts` (or the existing content modules). Each lesson currently has one concept and one scenario question. Keep exercises separate from claims about source systems, and update retrieval notes only after actually reviewing the primary material.
 
+### Original systems practice and suggested directories
+
+The user-suggested [SystemDesign.io](https://systemdesign.io), [Fanout overview](https://fanout.sh/system/overview), [Fanout systems](https://fanout.sh/system/systems), and [Fanout case studies](https://fanout.sh/system/case-studies) are available as external resource cards. All four failed DNS lookup in the implementation environment on 2026-10-27. Their content, syllabus, and current availability were **not verified**; this is not evidence that they are unavailable to other readers. The four additions are reference-only, bringing the library to four retrieved references and twelve reference-only entries.
+
+No articles, diagrams, exercises, or solutions were imported or mirrored. The six new lessons, twelve questions, and three quests are independently written to address gaps in this app's existing curriculum, not asserted coverage gaps in either external site. There is no claimed affiliation, completeness, or company-specific architecture verification. If the pages become accessible, review their public coverage before describing any overlap; do not change retrieval labels based only on URLs.
+
+Start with **Browse a durable catalog**, then **Deliver durable notifications**, and finally **Rebuild an event-driven read model**. Read the pagination, transaction, and projection lessons alongside them. The notification and projection diagrams abstract an outbox publisher into App Server; adding an App Server → Queue edge does not make a database/queue dual write atomic. Queue represents transport, not a guaranteed permanent replay log. Authorization, idempotency, cursor correctness, ordering, retention, replay cutover, and regional failover remain reasoning exercises, not capabilities verified by the topology checker.
+
 Boards stay in this browser/origin under `system-design-quest:board:v1:<task-id>` localStorage keys. They are not synced or backed up, so avoid storing sensitive information. Quiz progress resets when leaving Quiz or reloading.
 
 ## Project structure
@@ -86,6 +94,10 @@ src/
   gameConstants.ts     Playground copy and flow/configuration labels
   resourceConstants.ts Resource-library labels and exercise copy
   data/                Topics, quizzes, resources, tasks, and technology catalog
+    practiceTopics.ts  Original intermediate/advanced systems lessons
+    practiceQuestions.ts  Paired concept and scenario questions
+    practiceResources.ts  User-suggested directories and explicit retrieval limits
+    practiceTasks.ts   Catalog, notification, and projection topology exercises
   lib/architecture.ts  Default settings and legacy node placement
   lib/flow.ts          Bounded, cycle-safe directed request traversal
   lib/resources.ts     Pure resource filtering and filter-option helpers
