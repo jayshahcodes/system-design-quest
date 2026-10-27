@@ -1,5 +1,6 @@
 import type { Topic } from '../types'
 import { advancedTopics } from './advancedTopics.ts'
+import { reliabilityTopics } from './reliabilityTopics.ts'
 
 export const topics: Topic[] = [
   {
@@ -58,4 +59,5 @@ export const topics: Topic[] = [
     takeaway: 'Ask both “How long does it take?” and “How much can we handle?”',
   },
   ...advancedTopics,
+  ...reliabilityTopics,
 ]

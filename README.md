@@ -22,8 +22,9 @@ npm run preview  # Serve the production bundle locally
 
 ## Features
 
-- **Learn:** 13 lessons across Beginner, Intermediate, and Advanced levels. Foundations are followed by load balancing, caching, queues, CDNs, sharding, consistency, graph/feed design, and distributed IDs. Filter by level and follow the original sources from case-study lessons.
-- **Quiz:** 26 topic-mapped concept/scenario MCQs. Practice one topic or all topics, check answers with explanations, advance, and review your final score.
+- **Learn:** 21 lessons across Beginner, Intermediate, and Advanced levels. The original 13 lessons are preserved, with eight new lessons on retry budgets, idempotent workflows, fault isolation, adaptive concurrency, SLOs, overload control, failure domains, and live-event PubSub. New lessons include design exercises and reasoning checkpoints.
+- **Engineering resource library:** 12 curated references grouped by Netflix, Jio-related streaming, Amazon / AWS, and Google. Search titles, summaries, attribution, concepts, and takeaways; combine publisher and concept filters; expand reading guides and open related lessons directly.
+- **Quiz:** 42 topic-mapped concept/scenario MCQs. Practice one topic or all topics, check answers with explanations, advance, and review your final score.
 - **Visual Design Game:** add ten component types, including NoSQL DB, Object Storage, CDN, and Worker. Drag a library block onto the board, move nodes by their drag handle, and follow directed SVG connections. Click-to-add, keyboard movement, and editor X/Y coordinates provide non-drag alternatives.
 - **Technology choices:** compare curated popular tools such as PostgreSQL/MySQL, Redis/Memcached, MongoDB/DynamoDB, Kafka/RabbitMQ, Nginx/HAProxy, and object-storage/CDN options. Selections are learning annotations with trade-off descriptions, not integrations, endorsements, or rankings.
 - **Configure the system:** edit names, types, replicas (1–100), per-replica illustrative capacity (1–100,000), database shards (1–128), cache TTL (0–86,400 seconds) and policy, or stateless server/worker behavior. Type changes reset incompatible settings.
@@ -54,6 +55,21 @@ npm run preview  # Serve the production bundle locally
 
 Lessons link to Netflix's Open Connect overview, the Google Spanner paper, the Vitess project (which originated at YouTube), Meta's TAO paper, and Twitter's archived Snowflake project. They distinguish published/historical designs from proposed learning exercises. These sources describe specific contexts and points in time; the game does not reproduce those companies' current internals. External source availability is outside this app.
 
+### Engineering reading paths
+
+The resource library adds:
+
+- **Netflix:** retrieved Concurrency Limits and historical Hystrix documentation, plus the *Performance Under Load* reading reference. Explore admission control, queueing, fault isolation, and safe degradation. Hystrix is explicitly marked as maintenance-mode historical material, not a recommendation for new adoption.
+- **Amazon / AWS:** Builders’ Library references for timeouts/retries/jitter, idempotent APIs, and static stability, plus retrieved AWS SDK retry documentation. Practice retry amplification, ambiguous outcomes, duplicate operations, and failure-domain capacity.
+- **Google:** SRE reading references for service-level objectives and handling overload, plus a retrieved public disaster-recovery documentation template. Define good events, error budgets, shedding policies, dependencies, and usable restoration procedures.
+- **Jio-related streaming:** two **historical Hotstar** engineering references on PubSub and audience reactions. These are not attributed to Reliance Jio telecommunications, and they are not presented as verified descriptions of current JioHotstar infrastructure. The live-event lesson is an original exercise about fan-out, reconnects, and slow-consumer policies.
+
+**Curation limits:** direct blog/SRE-site retrieval failed in the implementation environment. Four primary documentation sources were retrieved through GitHub during curation on 2026-10-27: Netflix Concurrency Limits, Netflix Hystrix, AWS SDK retry package documentation, and Google's disaster-recovery template. Those entries are labeled **Retrieved for curation**. The other eight entries are labeled **Reference only · not retrieved**, with explicit notes; their guides contain general design principles, reading goals, and original exercises rather than claims about unavailable article details. Hotstar URLs were discovered through public reading-list citations, not primary-page retrieval. No publication dates, current production claims, or numerical benchmarks are inferred from titles. This is a curated starting library, not an exhaustive catalog or a live link checker.
+
+### Add learning resources
+
+Add a record to `src/data/resources.ts` with its publisher group, actual attribution, kind, level, concepts, original summary, reading takeaways, discussion prompt, related topic IDs, and retrieval status/note. Add lessons in `src/data/reliabilityTopics.ts` and questions in `src/data/reliabilityQuestions.ts` (or the existing content modules). Each lesson currently has one concept and one scenario question. Keep exercises separate from claims about source systems, and update retrieval notes only after actually reviewing the primary material.
+
 Boards stay in this browser/origin under `system-design-quest:board:v1:<task-id>` localStorage keys. They are not synced or backed up, so avoid storing sensitive information. Quiz progress resets when leaving Quiz or reloading.
 
 ## Project structure
@@ -64,17 +80,21 @@ src/
   components/          Learn, Quiz, and DesignGame sections
     ArchitectureCanvas.tsx  Drag/drop nodes, keyboard movement, and directed edges
     FlowPanel.tsx       Traversal controls and step-by-step flow explanations
+    ResourceLibrary.tsx Searchable reading guides and related lesson navigation
     shared/            Reusable buttons, badges, headers, fields, and options
   constants.ts         UI copy, icons, navigation, and copy formatters
   gameConstants.ts     Playground copy and flow/configuration labels
-  data/                Topics, quiz questions, tasks, and technology catalog
+  resourceConstants.ts Resource-library labels and exercise copy
+  data/                Topics, quizzes, resources, tasks, and technology catalog
   lib/architecture.ts  Default settings and legacy node placement
   lib/flow.ts          Bounded, cycle-safe directed request traversal
+  lib/resources.ts     Pure resource filtering and filter-option helpers
   lib/storage.ts       Defensive board parsing and localStorage access
   lib/validation.ts    Pure data-driven task evaluation
   types.ts             Shared content, board, task, and result interfaces
   index.css            Tailwind integration and responsive styles
   game.css             Visual playground and flow styling
+  resource.css         Responsive reading library and exercise styling
 tests/                 Content, validation, persistence, copy, and JSX convention tests
 ```
 

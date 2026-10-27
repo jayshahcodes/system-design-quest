@@ -9,6 +9,26 @@ export interface Topic {
   takeaway: string
   level?: 'Beginner' | 'Intermediate' | 'Advanced'
   sources?: { title: string; url: string; publisher: string }[]
+  exercise?: { prompt: string; checkpoints: string[] }
+}
+
+export type ResourcePublisher = 'Netflix' | 'Jio ecosystem' | 'Amazon / AWS' | 'Google'
+
+export interface LearningResource {
+  id: string
+  title: string
+  url: string
+  publisher: ResourcePublisher
+  attribution: string
+  kind: 'Engineering article' | 'Engineering guide' | 'Project documentation' | 'Customer case study'
+  level: 'Intermediate' | 'Advanced'
+  concepts: string[]
+  summary: string
+  takeaways: string[]
+  discussion: string
+  topicIds: string[]
+  verification: 'retrieved' | 'reference-only'
+  verificationNote: string
 }
 
 export interface QuizQuestion {

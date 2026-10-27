@@ -1,5 +1,6 @@
 import type { QuizQuestion } from '../types'
 import { advancedQuestions } from './advancedQuestions.ts'
+import { reliabilityQuestions } from './reliabilityQuestions.ts'
 
 export const questions: QuizQuestion[] = [
   { id: 'roles', topicId: 'client-server', kind: 'concept', prompt: 'When a browser requests a web page, which role does it play?', options: ['Database', 'Client', 'DNS resolver', 'Load balancer'], answer: 1, explanation: 'The browser initiates the request, so it is the client. The server handles the request and returns a response.' },
@@ -13,4 +14,5 @@ export const questions: QuizQuestion[] = [
   { id: 'latency', topicId: 'performance', kind: 'concept', prompt: 'Which metric describes the time taken by a single request?', options: ['Throughput', 'Replica count', 'Latency', 'Storage capacity'], answer: 2, explanation: 'Latency measures duration. Throughput measures completed work per unit of time.' },
   { id: 'throughput', topicId: 'performance', kind: 'scenario', prompt: 'A service completes 2,000 requests each second. What does that number describe?', options: ['Throughput', 'p95 latency', 'DNS TTL', 'Concurrent user count'], answer: 0, explanation: 'Requests per second measures throughput. It does not directly tell us latency or the number of concurrent users.' },
   ...advancedQuestions,
+  ...reliabilityQuestions,
 ]

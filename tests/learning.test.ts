@@ -5,7 +5,7 @@ import { questions } from '../src/data/questions.ts'
 import { learningLevels, topicCount, topicNumber, topicRange } from '../src/constants.ts'
 
 test('learning path expands from foundations to intermediate and advanced topics', () => {
-  assert.equal(topics.length, 13)
+  assert.equal(topics.length, 21)
   assert.equal(new Set(topics.map((topic) => topic.id)).size, topics.length)
   for (const level of learningLevels) {
     assert.ok(topics.some((topic) => topic.level === level))

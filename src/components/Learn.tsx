@@ -10,6 +10,8 @@ import { Badge } from './shared/Badge'
 import { Button } from './shared/Button'
 import { PageHeader } from './shared/PageHeader'
 import { SelectField } from './shared/Fields'
+import { ResourceLibrary } from './ResourceLibrary'
+import { resourceCopy } from '../resourceConstants'
 
 interface TopicCardProps {
   topic: Topic
@@ -63,6 +65,23 @@ function renderLevel(level: (typeof learningLevels)[number]) {
   return <option key={level} value={level}>{level}</option>
 }
 
+function renderCheckpoint(checkpoint: string) {
+  return <li key={checkpoint}>{checkpoint}</li>
+}
+
+function renderLessonExercise(exercise: Topic['exercise']) {
+  if (!exercise) return null
+
+  return (
+    <section className="lesson-exercise">
+      <h2>{resourceCopy.exerciseTitle}</h2>
+      <p>{exercise.prompt}</p>
+      <h3>{resourceCopy.exerciseCheckpoints}</h3>
+      <ul>{exercise.checkpoints.map(renderCheckpoint)}</ul>
+    </section>
+  )
+}
+
 interface LessonProps {
   topic: Topic
   onBack: () => void
@@ -98,6 +117,7 @@ function Lesson({ topic, onBack, onQuiz }: LessonProps) {
             <ul>{topic.sources.map(renderSource)}</ul>
           </section>
         )}
+        {renderLessonExercise(topic.exercise)}
         <Button onClick={practiceTopic}>{learnCopy.practice}</Button>
       </article>
     </div>
@@ -184,7 +204,12 @@ export function Learn({ onQuiz, onBuild }: { onQuiz: (topicId: string) => void; 
         </div>
         <HeroDiagram />
       </div>
-      <div className="section-heading">
+      <nav className="learning-jumps" aria-label={resourceCopy.jumpNavigation}>
+        <a href="#engineering-resources">{resourceCopy.jumpResources}</a>
+        <a href="#learning-topics">{resourceCopy.jumpLessons}</a>
+      </nav>
+      <ResourceLibrary onTopic={setSelectedId} />
+      <div id="learning-topics" className="section-heading">
         <div>
           <h2>{learnCopy.toolkit}<Badge variant="count-badge">{topicCount(visibleTopics.length)}</Badge></h2>
           <p>{learnCopy.essentials}</p>
